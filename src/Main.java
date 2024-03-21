@@ -28,56 +28,61 @@ public class Main {
 
         System.out.println("Добавление в базу:");
         System.out.println("Tasks:");
-        System.out.println(taskManager.getTaskMap());
+        System.out.println(taskManager.getTasks());
         System.out.println("Epics:");
-        System.out.println(taskManager.getEpicMap());
+        System.out.println(taskManager.getEpics());
         System.out.println("Subtasks:");
-        System.out.println(taskManager.getSubtaskMap());
+        System.out.println(taskManager.getSubtasks());
 
         System.out.println();
 
         System.out.println("Обновление статусов:");
         taskManager.updateTask(task1, Status.DONE);
         System.out.println("Task 1: " + task1.getStatus());
-        taskManager.updateSubtask(subtask3, Status.IN_PROGRESS);
+        taskManager.updateSubtask(subtask3, Status.DONE);
         System.out.println("Subtask 3: " + subtask3.getStatus());
         System.out.println("Epic 2:" + epic2.getStatus());
-        taskManager.updateEpic(epic1, Status.DONE);
-        System.out.println("Epic 1: " + epic1.getStatus());
+        taskManager.updateSubtask(subtask1, Status.IN_PROGRESS);
         System.out.println("Subtask 1: " + subtask1.getStatus());
-        System.out.println("Subtask 2: " + subtask2.getStatus());
+        System.out.println("Epic 1:" + epic1.getStatus());
+
+        System.out.println();
+        System.out.println("Добавляем Subtask 4 к Epic 1 и проверяем изменение статуса Epic 1");
+        Subtask subtask4 = new Subtask("Перевезти мебель", "Упаковать мебель", epic1.getId());
+        taskManager.createSubtask(subtask4);
+        System.out.println("Epic 1:" + epic1.getStatus());
 
         System.out.println();
 
         System.out.println("Текущая база Epics:");
-        System.out.println(taskManager.getEpicMap());
+        System.out.println(taskManager.getEpics());
         System.out.println("Текущая база Subtasks:");
-        System.out.println(taskManager.getSubtaskMap());
+        System.out.println(taskManager.getSubtasks());
+
+        System.out.println();
+
+        System.out.println("Удаляем Subtask2:");
+        taskManager.deleteSubtaskById(subtask2.getId());
+        System.out.println("Текущая база Subtask:");
+        System.out.println(taskManager.getSubtasks());
 
         System.out.println();
 
         System.out.println("Удаляем Epic1:");
         taskManager.deleteEpicById(epic1.getId());
         System.out.println("Текущая база Epics:");
-        System.out.println(taskManager.getEpicMap());
+        System.out.println(taskManager.getEpics());
         System.out.println("Текущая база Subtasks:");
-        System.out.println(taskManager.getSubtaskMap());
-
-        System.out.println();
-
-        System.out.println("Удаляем Subtask3:");
-        taskManager.deleteSubtaskById(subtask3.getId());
-        System.out.println("Текущая база Subtask:");
-        System.out.println(taskManager.getSubtaskMap());
+        System.out.println(taskManager.getSubtasks());
 
         System.out.println();
 
         System.out.println("Текущая база Task:");
-        System.out.println(taskManager.getTaskMap());
+        System.out.println(taskManager.getTasks());
         System.out.println("Чистим базу");
         taskManager.deleteAllTask();
         System.out.println("Текущая база Task:");
-        System.out.println(taskManager.getTaskMap());
+        System.out.println(taskManager.getTasks());
 
     }
 
