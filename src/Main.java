@@ -2,12 +2,13 @@ import ru.yandex.tasktreker.model.Epic;
 import ru.yandex.tasktreker.model.Status;
 import ru.yandex.tasktreker.model.Subtask;
 import ru.yandex.tasktreker.model.Task;
+import ru.yandex.tasktreker.service.Managers;
 import ru.yandex.tasktreker.service.TaskManager;
 
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = Managers.getDefault();
 
         Task task1 = new Task("Уборка", "Помыть полы");
         taskManager.createTask(task1);
