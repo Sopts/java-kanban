@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class InMemoryTaskManagerTest {
 
     TaskManager taskManager = Managers.getDefault();
-    HistoryManager historyManager = ((InMemoryTaskManager) taskManager).getInMemoryHistoryManager();
 
     /* согласно ТЗ данные тесты не проверялись:
     проверьте, что объект Epic нельзя добавить в самого себя в виде подзадачи;
@@ -59,8 +58,8 @@ class InMemoryTaskManagerTest {
         taskManager.updateTask(task, Status.DONE);
         taskManager.getTaskById(task.getId());
 
-        assertEquals(2, historyManager.getHistory().size());
-        assertNotEquals(historyManager.getHistory().get(0), historyManager.getHistory().get(1));
+        assertEquals(2, taskManager.getHistory().size());
+        assertNotEquals(taskManager.getHistory().get(0), taskManager.getHistory().get(1));
     }
 
 }

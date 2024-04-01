@@ -8,12 +8,13 @@ import ru.yandex.tasktreker.model.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private final HashMap<Integer, Epic> epics = new HashMap<>();
+    private final Map<Integer, Task> tasks = new HashMap<>();
+    private final Map<Integer, Subtask> subtasks = new HashMap<>();
+    private final Map<Integer, Epic> epics = new HashMap<>();
 
     private int count = 0;
 
@@ -23,28 +24,23 @@ public class InMemoryTaskManager implements TaskManager {
         this.inMemoryHistoryManager = inMemoryHistoryManager;
     }
 
-    public HistoryManager getInMemoryHistoryManager() {
-        return inMemoryHistoryManager;
-    }
-
-    @Override
     public int changeCount() {
         count++;
         return count;
     }
 
     @Override
-    public HashMap<Integer, Task> getTasks() {
+    public Map<Integer, Task> getTasks() {
         return tasks;
     }
 
     @Override
-    public HashMap<Integer, Subtask> getSubtasks() {
+    public Map<Integer, Subtask> getSubtasks() {
         return subtasks;
     }
 
     @Override
-    public HashMap<Integer, Epic> getEpics() {
+    public Map<Integer, Epic> getEpics() {
         return epics;
     }
 
@@ -193,6 +189,11 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        return inMemoryHistoryManager.getHistory();
     }
 
 }

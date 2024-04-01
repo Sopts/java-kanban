@@ -5,17 +5,16 @@ import ru.yandex.tasktreker.model.Status;
 import ru.yandex.tasktreker.model.Subtask;
 import ru.yandex.tasktreker.model.Task;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface TaskManager {
-    int changeCount();
 
-    HashMap<Integer, Task> getTasks();
+    Map<Integer, Task> getTasks();
 
-    HashMap<Integer, Subtask> getSubtasks();
+    Map<Integer, Subtask> getSubtasks();
 
-    HashMap<Integer, Epic> getEpics();
+    Map<Integer, Epic> getEpics();
 
     void deleteAllTask();
 
@@ -48,5 +47,7 @@ public interface TaskManager {
     void deleteEpicById(int id);
 
     List<Subtask> getAllSubtasksForEpicId(int epicId);
+
+    List<Task> getHistory();
 
    }
