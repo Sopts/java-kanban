@@ -3,25 +3,18 @@ package ru.yandex.tasktreker.service;
 import org.junit.jupiter.api.Test;
 import ru.yandex.tasktreker.model.Epic;
 import ru.yandex.tasktreker.model.Status;
+import ru.yandex.tasktreker.model.Subtask;
 import ru.yandex.tasktreker.model.Task;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class InMemoryTaskManagerTest {
 
     TaskManager taskManager = Managers.getDefault();
-
-    /* согласно ТЗ данные тесты не проверялись:
-    проверьте, что объект Epic нельзя добавить в самого себя в виде подзадачи;
-    проверьте, что объект Subtask нельзя сделать своим же эпиком;
-    ввиду того, что в параметрах метода уже указан тип объекта Epic или Subtask,
-    соотвественно код при неправильных типах нескомпилируется.
-    Данный вопрос обсуждался в пачке.
-    Также не проверялся тест:
-    проверьте, что задачи с заданным id и сгенерированным id не конфликтуют внутри менеджера;
-    т.к. по коду id всегда генерируется.
-    */
 
     @Test
     public void shouldTasksEqualsByIdAndEqualsWhenAddedToManager() {
@@ -49,17 +42,71 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldSavePreviousVersionTaskOfHistory() {
+    public void shouldRemovePreviousVersionTaskOfHistory() {
         Task task = new Task("Task", "Description");
 
         taskManager.createTask(task);
-        taskManager.getTaskById(task.getId());
+
+        for (int i = 0; i < 100; i++) {
+            taskManager.getTaskById(task.getId());
+        }
 
         taskManager.updateTask(task, Status.DONE);
         taskManager.getTaskById(task.getId());
 
-        assertEquals(2, taskManager.getHistory().size());
-        assertNotEquals(taskManager.getHistory().get(0), taskManager.getHistory().get(1));
+        assertEquals(1, taskManager.getHistory().size());
+        assertEquals(Status.DONE, taskManager.getHistory().getFirst().getStatus());
+    }
+
+    @Test
+    public void shouldGetRightHistoryId() {
+        Task task1 = new Task("Task1", "Description");
+        Task task2 = new Task("Task2", "Description");
+        Epic epic1 = new Epic("Epic1", "Description");
+        Epic epic2 = new Epic("Epic2", "Description");
+
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+        taskManager.createEpic(epic1);
+        taskManager.createEpic(epic2);
+
+        List<Integer> expectedListHistoryId = new ArrayList<>();
+
+        taskManager.getTaskById(task2.getId());
+        expectedListHistoryId.add(task2.getId());
+        taskManager.getEpicById(epic1.getId());
+        expectedListHistoryId.add(epic1.getId());
+        taskManager.getEpicById(epic2.getId());
+        expectedListHistoryId.add(epic2.getId());
+        taskManager.getTaskById(task1.getId());
+        expectedListHistoryId.add(task1.getId());
+
+        List<Integer> actualListHistoryId = new ArrayList<>();
+
+        for (Task task : taskManager.getHistory()) {
+            actualListHistoryId.add(task.getId());
+        }
+
+        assertEquals(expectedListHistoryId, actualListHistoryId);
+    }
+
+    @Test
+    public void shouldEpicDontHaveSubtaskIdAfterDelete () {
+        Epic epic1 = new Epic("Epic1", "Description");
+        taskManager.createEpic(epic1);
+
+        Subtask subtask1 = new Subtask("Subtask1", "Description", epic1.getId());
+        taskManager.createSubtask(subtask1);
+
+        Subtask subtask2 = new Subtask("Subtask2", "Description", epic1.getId());
+        taskManager.createSubtask(subtask2);
+
+        taskManager.deleteSubtaskById(subtask1.getId());
+        taskManager.deleteSubtaskById(subtask2.getId());
+
+        assertFalse(epic1.getSubtasks().contains(subtask1));
+        assertFalse(epic1.getSubtasks().contains(subtask2));
+
     }
 
 }
