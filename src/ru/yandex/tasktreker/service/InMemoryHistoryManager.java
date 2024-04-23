@@ -2,25 +2,16 @@ package ru.yandex.tasktreker.service;
 
 import ru.yandex.tasktreker.model.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
     private final Map<Integer, Node> historyTasks = new HashMap<>();
     private Node head;
     private Node tail;
-
-    private static class Node {
-        Task task;
-        Node prev;
-        Node next;
-
-        Node(Task task) {
-            this.task = task;
-            this.prev = null;
-            this.next = null;
-        }
-    }
 
     @Override
     public List<Task> getHistory() {
@@ -80,6 +71,18 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
         if (node.next != null) {
             node.next.prev = node.prev;
+        }
+    }
+
+    private static class Node {
+        Task task;
+        Node prev;
+        Node next;
+
+        Node(Task task) {
+            this.task = task;
+            this.prev = null;
+            this.next = null;
         }
     }
 }
