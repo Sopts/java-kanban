@@ -12,7 +12,7 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws IOException {
 
-        FileBackedTaskManager manager = Managers.getDefaultFile(Managers.getDefaultHistory());
+        FileBackedTaskManager manager = Managers.getDefaultFile();
 
         Task task1 = new Task("Task1", "Description");
         manager.createTask(task1);

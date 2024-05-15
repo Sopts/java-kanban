@@ -13,8 +13,8 @@ import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    public FileBackedTaskManager(HistoryManager inMemoryHistoryManager) {
-        super(inMemoryHistoryManager);
+    public FileBackedTaskManager() {
+        super(Managers.getDefaultHistory());
     }
 
     public String toString(Task task) {
@@ -27,7 +27,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return result + "\n";
     }
 
-    public void save() {
+    private void save() {
         try (FileWriter writer = new FileWriter("tasks.csv")) {
             List<Task> allTasks = new ArrayList<>();
             allTasks.addAll(tasks.values());
@@ -74,6 +74,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTaskManager loadFromFile(File file) throws IOException {
+        FileBackedTaskManager loadedManager = new FileBackedTaskManager();
         String fileContent = Files.readString(file.toPath()).replaceAll("\r", "");
         if (!fileContent.isEmpty()) {
             String[] taskData = fileContent.split("\n");
@@ -84,86 +85,82 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 if (taskId > maxId) {
                     maxId = taskId;
                 }
-                switch (task.getTaskType()) {
-                    case TASK -> tasks.put(task.getId(), task);
-                    case EPIC -> epics.put(task.getId(), (Epic) task);
-                    case SUBTASK -> subtasks.put(task.getId(), (Subtask) task);
-                }
+                loadedManager.putTask(task);
             }
             InMemoryTaskManager.setCount(maxId);
         }
-        return new FileBackedTaskManager(inMemoryHistoryManager);
+        return loadedManager;
     }
 
 
     @Override
-    public void deleteAllTask() throws IOException {
+    public void deleteAllTask() {
         super.deleteAllTask();
         save();
     }
 
     @Override
-    public void deleteAllSubtask() throws IOException {
+    public void deleteAllSubtask() {
         super.deleteAllSubtask();
         save();
     }
 
     @Override
-    public void deleteAllEpic() throws IOException {
+    public void deleteAllEpic() {
         super.deleteAllEpic();
         save();
     }
 
     @Override
-    public void createTask(Task task) throws IOException {
+    public void createTask(Task task) {
         super.createTask(task);
         save();
     }
 
     @Override
-    public void createSubtask(Subtask subtask) throws IOException {
+    public void createSubtask(Subtask subtask) {
         super.createSubtask(subtask);
         save();
     }
 
     @Override
-    public void createEpic(Epic epic) throws IOException {
+    public void createEpic(Epic epic) {
         super.createEpic(epic);
         save();
     }
 
     @Override
-    public void updateTask(Task task, Status status) throws IOException {
+    public void updateTask(Task task, Status status) {
         super.updateTask(task, status);
         save();
     }
 
     @Override
-    public void updateSubtask(Subtask subtask, Status status) throws IOException {
+    public void updateSubtask(Subtask subtask, Status status) {
         super.updateSubtask(subtask, status);
         save();
     }
 
     @Override
-    public void updateEpic(Epic epic) throws IOException {
+    public void updateEpic(Epic epic) {
         super.updateEpic(epic);
         save();
     }
 
     @Override
-    public void deleteTaskById(int id) throws IOException {
+    public void deleteTaskById(int id) {
         super.deleteTaskById(id);
         save();
     }
 
     @Override
-    public void deleteSubtaskById(int id) throws IOException {
+    public void deleteSubtaskById(int id) {
         super.deleteSubtaskById(id);
         save();
     }
 
     @Override
-    public void deleteEpicById(int id) throws IOException {
+    public void deleteEpicById(int id) {
         super.deleteEpicById(id);
         save();
     }

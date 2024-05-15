@@ -16,7 +16,7 @@ class FileBackedTasManagerTest {
 
     @BeforeEach
     void setUp() {
-        manager = Managers.getDefaultFile(Managers.getDefaultHistory());
+        manager = Managers.getDefaultFile();
     }
 
     @Test
@@ -24,8 +24,7 @@ class FileBackedTasManagerTest {
         int expectedTasks = manager.getTasks().size();
 
         File tempFile = File.createTempFile("test", ".csv");
-
-        manager.save();
+        
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
 
