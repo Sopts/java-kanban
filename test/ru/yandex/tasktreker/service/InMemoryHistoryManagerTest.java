@@ -6,20 +6,25 @@ import ru.yandex.tasktreker.model.Status;
 import ru.yandex.tasktreker.model.Subtask;
 import ru.yandex.tasktreker.model.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class InMemoryTaskManagerTest {
+class InMemoryHistoryManagerTest extends TaskManagerTest {
 
     TaskManager taskManager = Managers.getDefault();
 
     @Test
     public void shouldTasksEqualsByIdAndEqualsWhenAddedToManager() {
-        Task task = new Task("Task", "Description");
-        Epic epic = new Epic("Epic", "Description");
+        Task task = new Task("Task", "Description",
+                LocalDateTime.now(), Duration.ofHours(1));
+
+        Epic epic = new Epic("Epic", "Description",
+                LocalDateTime.now().plusHours(1), Duration.ofHours(1));
 
         taskManager.createTask(task);
         int taskId = task.getId();
@@ -27,12 +32,12 @@ class InMemoryTaskManagerTest {
         taskManager.createEpic(epic);
         int epicId = epic.getId();
 
-        Task expectedTask = new Task(task.getName(), task.getDescription());
+        Task expectedTask = new Task(task.getName(), task.getDescription(), task.getStartTime(), task.getDuration());
         expectedTask.setId(taskId);
 
         Task actualTask = taskManager.getTaskById(taskId);
 
-        Epic expectedEpic = new Epic(epic.getName(), epic.getDescription());
+        Epic expectedEpic = new Epic(epic.getName(), epic.getDescription(), epic.getStartTime(), epic.getDuration());
         expectedEpic.setId(epicId);
 
         Epic actualEpic = taskManager.getEpicById(epicId);
@@ -43,7 +48,8 @@ class InMemoryTaskManagerTest {
 
     @Test
     public void shouldRemovePreviousVersionTaskOfHistory() {
-        Task task = new Task("Task", "Description");
+        Task task = new Task("Task", "Description",
+                LocalDateTime.now(), Duration.ofHours(1));
 
         taskManager.createTask(task);
 
@@ -60,11 +66,14 @@ class InMemoryTaskManagerTest {
 
     @Test
     public void shouldGetRightHistoryId() {
-        Task task1 = new Task("Task1", "Description");
-        Task task2 = new Task("Task2", "Description");
-        Epic epic1 = new Epic("Epic1", "Description");
-        Epic epic2 = new Epic("Epic2", "Description");
-
+        Task task1 = new Task("Task1", "Description",
+                LocalDateTime.now().plusHours(1), Duration.ofHours(1));
+        Task task2 = new Task("Task2", "Description",
+                LocalDateTime.now().plusHours(2), Duration.ofHours(1));
+        Epic epic1 = new Epic("Epic1", "Description",
+                LocalDateTime.now().plusHours(3), Duration.ofHours(1));
+        Epic epic2 = new Epic("Epic2", "Description",
+                LocalDateTime.now().plusHours(4), Duration.ofHours(1));
         taskManager.createTask(task1);
         taskManager.createTask(task2);
         taskManager.createEpic(epic1);
@@ -91,14 +100,17 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldEpicDontHaveSubtaskIdAfterDelete () {
-        Epic epic1 = new Epic("Epic1", "Description");
+    public void shouldEpicDontHaveSubtaskIdAfterDelete() {
+        Epic epic1 = new Epic("Epic1", "Description",
+                LocalDateTime.now().plusHours(1), Duration.ofHours(1));
         taskManager.createEpic(epic1);
 
-        Subtask subtask1 = new Subtask("Subtask1", "Description", epic1.getId());
+        Subtask subtask1 = new Subtask("Subtask1", "Description",
+                LocalDateTime.now().plusHours(2), Duration.ofHours(1), epic1.getId());
         taskManager.createSubtask(subtask1);
 
-        Subtask subtask2 = new Subtask("Subtask2", "Description", epic1.getId());
+        Subtask subtask2 = new Subtask("Subtask2", "Description",
+                LocalDateTime.now().plusHours(3), Duration.ofHours(1), epic1.getId());
         taskManager.createSubtask(subtask2);
 
         taskManager.deleteSubtaskById(subtask1.getId());
@@ -107,6 +119,11 @@ class InMemoryTaskManagerTest {
         assertFalse(epic1.getSubtasks().contains(subtask1));
         assertFalse(epic1.getSubtasks().contains(subtask2));
 
+    }
+
+    @Test
+    public void shouldGetEmptyHistory() {
+        assertEquals(0, taskManager.getHistory().size());
     }
 
 }

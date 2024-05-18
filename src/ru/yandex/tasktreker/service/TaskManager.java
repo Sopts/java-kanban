@@ -7,6 +7,7 @@ import ru.yandex.tasktreker.model.Task;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 public interface TaskManager {
 
@@ -50,4 +51,8 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
-   }
+    TreeSet<Task> getPrioritizedTasks();
+
+    boolean isTasksIntersect(Task task1, Task task2);
+
+}
