@@ -12,21 +12,37 @@ import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private final Map<Integer, Task> tasks = new HashMap<>();
-    private final Map<Integer, Subtask> subtasks = new HashMap<>();
-    private final Map<Integer, Epic> epics = new HashMap<>();
+    protected final Map<Integer, Task> tasks = new HashMap<>();
+    protected final Map<Integer, Subtask> subtasks = new HashMap<>();
+    protected final Map<Integer, Epic> epics = new HashMap<>();
 
-    private int count = 0;
+    public HistoryManager inMemoryHistoryManager;
 
-    private final HistoryManager inMemoryHistoryManager;
+    protected static int count = 0;
 
     public InMemoryTaskManager(HistoryManager inMemoryHistoryManager) {
         this.inMemoryHistoryManager = inMemoryHistoryManager;
     }
 
+    public static void setCount(int count) {
+        InMemoryTaskManager.count = count;
+    }
+
+    public static int getCount() {
+        return count;
+    }
+
     public int changeCount() {
         count++;
         return count;
+    }
+
+    public void putTask(Task task) {
+        switch (task.getTaskType()) {
+            case TASK -> tasks.put(task.getId(), task);
+            case EPIC -> epics.put(task.getId(), (Epic) task);
+            case SUBTASK -> subtasks.put(task.getId(), (Subtask) task);
+        }
     }
 
     @Override

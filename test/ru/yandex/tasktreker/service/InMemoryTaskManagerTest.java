@@ -6,6 +6,7 @@ import ru.yandex.tasktreker.model.Status;
 import ru.yandex.tasktreker.model.Subtask;
 import ru.yandex.tasktreker.model.Task;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ class InMemoryTaskManagerTest {
     TaskManager taskManager = Managers.getDefault();
 
     @Test
-    public void shouldTasksEqualsByIdAndEqualsWhenAddedToManager() {
+    public void shouldTasksEqualsByIdAndEqualsWhenAddedToManager() throws IOException {
         Task task = new Task("Task", "Description");
         Epic epic = new Epic("Epic", "Description");
 
@@ -42,7 +43,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldRemovePreviousVersionTaskOfHistory() {
+    public void shouldRemovePreviousVersionTaskOfHistory() throws IOException {
         Task task = new Task("Task", "Description");
 
         taskManager.createTask(task);
@@ -59,7 +60,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldGetRightHistoryId() {
+    public void shouldGetRightHistoryId() throws IOException {
         Task task1 = new Task("Task1", "Description");
         Task task2 = new Task("Task2", "Description");
         Epic epic1 = new Epic("Epic1", "Description");
@@ -91,7 +92,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldEpicDontHaveSubtaskIdAfterDelete () {
+    public void shouldEpicDontHaveSubtaskIdAfterDelete () throws IOException {
         Epic epic1 = new Epic("Epic1", "Description");
         taskManager.createEpic(epic1);
 
