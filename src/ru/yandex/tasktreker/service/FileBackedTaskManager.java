@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +21,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public String toString(Task task) {
         String result = task.getId() + "," + task.getTaskType() + "," + task.getName()
-                + "," + task.getStatus() + "," + task.getDescription();
+                + "," + task.getStatus() + "," + task.getDescription() + "," + task.getStartTime()
+                + "," + task.getDuration();
         if (task instanceof Subtask subtask) {
             result += "," + subtask.getEpicId();
         }
@@ -49,22 +52,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = data[2];
         Status status = Status.valueOf(data[3]);
         String description = data[4];
+        LocalDateTime startTime = LocalDateTime.parse(data[5]);
+        Duration duration = Duration.parse(data[6]);
         switch (type) {
             case TASK -> {
-                Task task = new Task(name, description);
+                Task task = new Task(name, description, startTime, duration);
                 task.setId(id);
                 task.setStatus(status);
                 return task;
             }
             case EPIC -> {
-                Epic epic = new Epic(name, description);
+                Epic epic = new Epic(name, description, startTime, duration);
                 epic.setId(id);
                 epic.setStatus(status);
                 return epic;
             }
             case SUBTASK -> {
-                int epicId = Integer.parseInt(data[5]);
-                Subtask subtask = new Subtask(name, description, epicId);
+                int epicId = Integer.parseInt(data[7]);
+                Subtask subtask = new Subtask(name, description, startTime, duration, epicId);
                 subtask.setId(id);
                 subtask.setStatus(status);
                 return subtask;
@@ -73,23 +78,27 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         throw new IllegalArgumentException("Указан недопустимый тип задачи: " + type);
     }
 
-    public static FileBackedTaskManager loadFromFile(File file) throws IOException {
+    public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager loadedManager = new FileBackedTaskManager();
-        String fileContent = Files.readString(file.toPath()).replaceAll("\r", "");
-        if (!fileContent.isEmpty()) {
-            String[] taskData = fileContent.split("\n");
-            int maxId = 0;
-            for (String data : taskData) {
-                Task task = fromString(data);
-                int taskId = task.getId();
-                if (taskId > maxId) {
-                    maxId = taskId;
+        try {
+            String fileContent = Files.readString(file.toPath()).replaceAll("\r", "");
+            if (!fileContent.isEmpty()) {
+                String[] taskData = fileContent.split("\n");
+                int maxId = 0;
+                for (String data : taskData) {
+                    Task task = fromString(data);
+                    int taskId = task.getId();
+                    if (taskId > maxId) {
+                        maxId = taskId;
+                    }
+                    loadedManager.putTask(task);
                 }
-                loadedManager.putTask(task);
+                InMemoryTaskManager.setCount(maxId);
             }
-            InMemoryTaskManager.setCount(maxId);
+            return loadedManager;
+        } catch (IOException e) {
+            throw new ManagerSaveException("Ошибка при загрузке задач: " + e.getMessage());
         }
-        return loadedManager;
     }
 
 

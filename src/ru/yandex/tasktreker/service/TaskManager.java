@@ -5,9 +5,9 @@ import ru.yandex.tasktreker.model.Status;
 import ru.yandex.tasktreker.model.Subtask;
 import ru.yandex.tasktreker.model.Task;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 public interface TaskManager {
 
@@ -17,11 +17,11 @@ public interface TaskManager {
 
     Map<Integer, Epic> getEpics();
 
-    void deleteAllTask() throws IOException;
+    void deleteAllTask();
 
-    void deleteAllSubtask() throws IOException;
+    void deleteAllSubtask();
 
-    void deleteAllEpic() throws IOException;
+    void deleteAllEpic();
 
     Task getTaskById(int id);
 
@@ -29,26 +29,30 @@ public interface TaskManager {
 
     Epic getEpicById(int id);
 
-    void createTask(Task task) throws IOException;
+    void createTask(Task task);
 
-    void createSubtask(Subtask subtask) throws IOException;
+    void createSubtask(Subtask subtask);
 
-    void createEpic(Epic epic) throws IOException;
+    void createEpic(Epic epic);
 
-    void updateTask(Task task, Status status) throws IOException;
+    void updateTask(Task task, Status status);
 
-    void updateSubtask(Subtask subtask, Status status) throws IOException;
+    void updateSubtask(Subtask subtask, Status status);
 
-    void updateEpic(Epic epic) throws IOException;
+    void updateEpic(Epic epic);
 
-    void deleteTaskById(int id) throws IOException;
+    void deleteTaskById(int id);
 
-    void deleteSubtaskById(int id) throws IOException;
+    void deleteSubtaskById(int id);
 
-    void deleteEpicById(int id) throws IOException;
+    void deleteEpicById(int id);
 
     List<Subtask> getAllSubtasksForEpicId(int epicId);
 
     List<Task> getHistory();
+
+    TreeSet<Task> getPrioritizedTasks();
+
+    boolean isTasksIntersect(Task task1, Task task2);
 
 }

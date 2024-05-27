@@ -6,16 +6,21 @@ import ru.yandex.tasktreker.model.Epic;
 import ru.yandex.tasktreker.model.Task;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class FileBackedTasManagerTest {
+class FileBackedTasManagerTest extends TaskManagerTest {
 
     FileBackedTaskManager manager;
 
     @BeforeEach
-    void setUp() {
+    public void setup() {
         manager = Managers.getDefaultFile();
     }
 
@@ -24,7 +29,7 @@ class FileBackedTasManagerTest {
         int expectedTasks = manager.getTasks().size();
 
         File tempFile = File.createTempFile("test", ".csv");
-        
+
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
 
@@ -34,9 +39,11 @@ class FileBackedTasManagerTest {
     }
 
     @Test
-    public void shouldSaveTasks() throws IOException {
-        Task task = new Task("Task", "Description");
-        Epic epic = new Epic("Epic", "Description");
+    public void shouldSaveTasks() {
+        Task task = new Task("Task", "Description",
+                LocalDateTime.now(), Duration.ofHours(1));
+        Epic epic = new Epic("Epic", "Description",
+                LocalDateTime.now().plusHours(1), Duration.ofHours(1));
 
         manager.createTask(task);
         int taskId = task.getId();
@@ -47,12 +54,12 @@ class FileBackedTasManagerTest {
         int expectedEpics = manager.getEpics().size();
 
 
-        Task expectedTask = new Task(task.getName(), task.getDescription());
+        Task expectedTask = new Task(task.getName(), task.getDescription(), task.getStartTime(), task.getDuration());
         expectedTask.setId(taskId);
 
         Task actualTask = manager.getTaskById(taskId);
 
-        Epic expectedEpic = new Epic(epic.getName(), epic.getDescription());
+        Epic expectedEpic = new Epic(epic.getName(), epic.getDescription(), epic.getStartTime(), epic.getDuration());
         expectedEpic.setId(epicId);
 
         Epic actualEpic = manager.getEpicById(epicId);
@@ -61,12 +68,15 @@ class FileBackedTasManagerTest {
         assertEquals(expectedEpics, manager.getEpics().size());
         assertEquals(expectedTask, actualTask);
         assertEquals(expectedEpic, actualEpic);
+
     }
 
     @Test
-    public void shouldLoadTasks() throws IOException {
-        Task task = new Task("Task", "Description");
-        Epic epic = new Epic("Epic", "Description");
+    public void shouldLoadTasks() {
+        Task task = new Task("Task", "Description",
+                LocalDateTime.now(), Duration.ofHours(1));
+        Epic epic = new Epic("Epic", "Description",
+                LocalDateTime.now().plusHours(1), Duration.ofHours(1));
 
         manager.createTask(task);
         int taskId = task.getId();
@@ -74,10 +84,10 @@ class FileBackedTasManagerTest {
         manager.createEpic(epic);
         int epicId = epic.getId();
 
-        Task expectedTask = new Task(task.getName(), task.getDescription());
+        Task expectedTask = new Task(task.getName(), task.getDescription(), task.getStartTime(), task.getDuration());
         expectedTask.setId(taskId);
 
-        Epic expectedEpic = new Epic(epic.getName(), epic.getDescription());
+        Epic expectedEpic = new Epic(epic.getName(), epic.getDescription(), epic.getStartTime(), epic.getDuration());
         expectedEpic.setId(epicId);
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(new File("tasks.csv"));
@@ -90,5 +100,16 @@ class FileBackedTasManagerTest {
 
     }
 
+    @Test
+    public void shouldThrowExceptionOnLoad() throws IOException {
+        File file = new File("tasks.csv");
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write("Невалидный данные");
+        }
+        assertThrows(NumberFormatException.class, () -> {
+            FileBackedTaskManager.loadFromFile(file);
+        }, "Ожидалось исключение NumberFormatException");
+        Files.delete(file.toPath());
+    }
 
 }
