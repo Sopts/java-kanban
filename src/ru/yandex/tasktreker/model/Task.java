@@ -2,6 +2,7 @@ package ru.yandex.tasktreker.model;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Task implements Comparable<Task> {
@@ -101,6 +102,10 @@ public class Task implements Comparable<Task> {
         return Objects.hash(id, name, description, status, taskType, duration, startTime);
     }
 
+    public String getStartTimeString() {
+        return startTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+    }
+
     @Override
     public String toString() {
         return "Task {" +
@@ -109,7 +114,7 @@ public class Task implements Comparable<Task> {
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 ", duration=" + duration +
-                ", startTime=" + startTime +
+                ", startTime=" + getStartTimeString() +
                 '}';
     }
 
