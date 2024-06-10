@@ -1,10 +1,9 @@
 package ru.yandex.tasktreker.service;
 
-import com.sun.net.httpserver.HttpServer;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.tasktreker.handler.*;
 import ru.yandex.tasktreker.model.Epic;
 import ru.yandex.tasktreker.model.Status;
 import ru.yandex.tasktreker.model.Subtask;
@@ -12,7 +11,6 @@ import ru.yandex.tasktreker.model.Task;
 import ru.yandex.tasktreker.server.HttpTaskServer;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -27,30 +25,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
-class HttpTaskManagerTasksTest extends HttpTaskServer {
+class HttpTaskManagerTasksTest {
 
-    HttpServer server = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
+    Gson gson = Managers.getGson();
+    TaskManager taskManager = Managers.getDefault();
+    HttpTaskServer taskServer = new HttpTaskServer(taskManager);
 
     HttpTaskManagerTasksTest() throws IOException {
-        super(Managers.getDefault());
     }
 
     @BeforeEach
     public void setUp() {
-        server.createContext("/tasks", new TaskHandler(taskManager));
-        server.createContext("/subtasks", new SubtaskHandler(taskManager));
-        server.createContext("/epics", new EpicHandler(taskManager));
-        server.createContext("/history", new HistoryHandler(taskManager));
-        server.createContext("/prioritized", new PrioritizedHandler(taskManager));
         taskManager.deleteAllTask();
         taskManager.deleteAllSubtask();
-        taskManager.deleteAllTask();
-        server.start();
+        taskManager.deleteAllEpic();
+        taskServer.start();
     }
 
     @AfterEach
     public void shutDown() {
-        server.stop(1);
+        taskServer.stop();
     }
 
 

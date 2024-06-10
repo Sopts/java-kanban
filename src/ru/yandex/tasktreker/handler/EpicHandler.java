@@ -34,8 +34,8 @@ public class EpicHandler extends BaseHttpHandler {
                             sendNotFound(httpExchange);
                         }
                     } else if (Pattern.matches("^/epics/\\d+/subtasks$", path)) {
-                        String pathId = path.replaceFirst("/epics/", "").
-                                replaceFirst("/subtasks", "");
+                        String pathId = path.replaceFirst("/epics/", "")
+                                .replaceFirst("/subtasks", "");
                         int id = parsePathId(pathId);
                         if (id != -1) {
                             String response = gson.toJson(taskManager.getAllSubtasksForEpicId(id));
