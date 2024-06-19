@@ -93,7 +93,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     }
                     loadedManager.putTask(task);
                 }
-                InMemoryTaskManager.setCount(maxId);
+                InMemoryTaskManager taskManager = new InMemoryTaskManager(null);
+                taskManager.setCount(maxId);
             }
             return loadedManager;
         } catch (IOException e) {

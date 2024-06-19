@@ -16,17 +16,18 @@ public class InMemoryTaskManager implements TaskManager {
 
     public HistoryManager inMemoryHistoryManager;
 
-    protected static int count = 0;
+    protected int count;
 
     public InMemoryTaskManager(HistoryManager inMemoryHistoryManager) {
         this.inMemoryHistoryManager = inMemoryHistoryManager;
+        this.count = 0;
     }
 
-    public static void setCount(int count) {
-        InMemoryTaskManager.count = count;
+    public void setCount(int count) {
+        this.count = count;
     }
 
-    public static int getCount() {
+    public int getCount() {
         return count;
     }
 
@@ -34,6 +35,7 @@ public class InMemoryTaskManager implements TaskManager {
         count++;
         return count;
     }
+
 
     public void putTask(Task task) {
         switch (task.getTaskType()) {
